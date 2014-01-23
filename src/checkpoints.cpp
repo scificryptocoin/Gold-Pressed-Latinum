@@ -25,14 +25,15 @@ namespace Checkpoints
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
         (     0, hashGenesisBlockOfficial )
-		( 25000, uint256("0x000000cb9275ff8cac27253a9b505fb9ffccc48e93e062234c213dcf7d4fb4ef"))
-		( 50000, uint256("0x000000009b7ad441b9933da0f93cb2f926fd9dc0cc39ed76c9f01e50ffd8d84d"))
-		( 75000, uint256("0x00000000bc8a42d42b4269f189695a3528115d90cb2e95def262f18f289b4434"))
-		( 100000, uint256("0x0000000240e30fbb92dc87b2025c561ce57802a9e5e5aeb71c07b5e65a30d6f5"))
-		( 120000, uint256("0x0000000b584764f84c6671f99240f7ae3abc1f74dae7260324b59f89ddac5af0"))
-		( 175000, uint256("0x0000002d2d9005148576fc1be6d303e9a9f226a6e8ea1bde45a8f867ec6d5ce6"))
-		( 240000, uint256("0x00000211f0de53d464848554b2412cd0de1d4d2012e473bfb54504bb08293a4c"))
+        ( 25000, uint256("0x000000cb9275ff8cac27253a9b505fb9ffccc48e93e062234c213dcf7d4fb4ef"))
+        ( 50000, uint256("0x000000009b7ad441b9933da0f93cb2f926fd9dc0cc39ed76c9f01e50ffd8d84d"))
+        ( 75000, uint256("0x00000000bc8a42d42b4269f189695a3528115d90cb2e95def262f18f289b4434"))
+        ( 100000, uint256("0x0000000240e30fbb92dc87b2025c561ce57802a9e5e5aeb71c07b5e65a30d6f5"))
+        ( 120000, uint256("0x0000000b584764f84c6671f99240f7ae3abc1f74dae7260324b59f89ddac5af0"))
+        ( 175000, uint256("0x0000002d2d9005148576fc1be6d303e9a9f226a6e8ea1bde45a8f867ec6d5ce6"))
+        ( 240000, uint256("0x00000211f0de53d464848554b2412cd0de1d4d2012e473bfb54504bb08293a4c"))
 		( 300000, uint256("0x00000152ce41d604847643462b5026c7726d39180d146bbcf52a1e5ef99d94b6"))
+		( 375000, uint256("0x000003868c6d38c70abe00c6ad8ff599ffd7d1bee5d0038f2accaeb6e8f62185"))
         ;
 
     static MapCheckpoints mapCheckpointsTestnet =
@@ -362,12 +363,19 @@ namespace Checkpoints
     // Is the sync-checkpoint too old?
     bool IsSyncCheckpointTooOld(unsigned int nSeconds)
     {
+
+// Defeat the "checkpoint too old" check, not needed now that GPL is launched and stable.
+/*
         LOCK(cs_hashSyncCheckpoint);
         // sync-checkpoint should always be accepted block
         assert(mapBlockIndex.count(hashSyncCheckpoint));
         const CBlockIndex* pindexSync = mapBlockIndex[hashSyncCheckpoint];
         return (pindexSync->GetBlockTime() + nSeconds < GetAdjustedTime());
+*/
+
+        return false;
     }
+
 }
 
 // ppcoin: sync-checkpoint master key

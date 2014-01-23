@@ -9,6 +9,7 @@
 #include "util.h"
 #include "main.h"
 #include "kernel.h"
+#include "ui_interface.h"
 #include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -607,7 +608,7 @@ CBlockIndex static * InsertBlockIndex(uint256 hash)
     if (!pindexNew)
         throw runtime_error("LoadBlockIndex() : new CBlockIndex failed");
     mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
-    pindexNew->phashBlock = &((*mi).first);
+    pindexNew->SetHash(hash);
 
     return pindexNew;
 }
@@ -650,6 +651,7 @@ bool CTxDB::LoadBlockIndex()
         return error("CTxDB::LoadBlockIndex() : hashBestChain not found in the block index");
     pindexBest = mapBlockIndex[hashBestChain];
     nBestHeight = pindexBest->nHeight;
+    nBestHeightTime = pindexBest->GetBlockTime();
     bnBestChainTrust = pindexBest->bnChainTrust;
     printf("LoadBlockIndex(): hashBestChain=%s  height=%d  trust=%s  date=%s\n",
       hashBestChain.ToString().substr(0,20).c_str(), nBestHeight, bnBestChainTrust.ToString().c_str(),
@@ -665,7 +667,7 @@ bool CTxDB::LoadBlockIndex()
 
     // Verify blocks in the best chain
     int nCheckLevel = GetArg("-checklevel", 1);
-    int nCheckDepth = GetArg( "-checkblocks", 2500);
+    int nCheckDepth = GetArg( "-checkblocks", 600);
     if (nCheckDepth == 0)
         nCheckDepth = 1000000000; // suffices until the year 19000
     if (nCheckDepth > nBestHeight)

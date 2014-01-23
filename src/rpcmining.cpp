@@ -11,6 +11,43 @@
 using namespace json_spirit;
 using namespace std;
 
+
+
+//
+// uint64_t GetNetworkHashPS( int lookup )
+//
+//    WM - Function to estimate network hash rate.  Mostly lifted from
+//    Litecoin and modified for GPL.
+//
+//    Parameters: lookup (int) - How many blocks to look into the past.
+//    Returns: Estimated GPL network hash rate (uint64_t)
+//
+
+uint64_t GetNetworkHashPS( int lookup )
+{
+    if( !pindexBest )
+        return 0;
+        
+    if( lookup < 0 )
+        lookup = 0;
+    
+    // If lookup is larger than chain, then set it to chain length.
+    if( lookup > pindexBest->nHeight )
+        lookup = pindexBest->nHeight;
+        
+    CBlockIndex *pindexPrev = pindexBest;
+    
+    for( int i = 0; i < lookup; ++i )
+        pindexPrev = pindexPrev->pprev;
+        
+    double timeDiff = pindexBest->GetBlockTime() - pindexPrev->GetBlockTime();
+    double timePerBlock = timeDiff / lookup;
+    
+    return (uint64_t)(((double)GetDifficulty() * pow(2.0, 32)) / timePerBlock);
+}
+
+
+
 Value getgenerate(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -63,6 +100,9 @@ Value gethashespersec(const Array& params, bool fHelp)
 
 Value getmininginfo(const Array& params, bool fHelp)
 {
+    unsigned char Nfactor;
+    uint64_t N;
+
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "getmininginfo\n"
@@ -77,10 +117,31 @@ Value getmininginfo(const Array& params, bool fHelp)
     obj.push_back(Pair("generate",      GetBoolArg("-gen")));
     obj.push_back(Pair("genproclimit",  (int)GetArg("-genproclimit", -1)));
     obj.push_back(Pair("hashespersec",  gethashespersec(params, false)));
+    obj.push_back(Pair("networkhashps", getnetworkhashps(params, false)));
     obj.push_back(Pair("pooledtx",      (uint64_t)mempool.size()));
     obj.push_back(Pair("testnet",       fTestNet));
+
+    Nfactor = GetNfactor( nBestHeightTime );
+    N = 1 << ( Nfactor + 1 );
+    
+    obj.push_back( Pair( "Nfactor", Nfactor ) );
+    obj.push_back( Pair( "N", N ) );
+    
+ 
+    
     return obj;
 }
+
+Value getnetworkhashps(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getnetworkhashps\n"
+            "Returns an estimate of the GoldPressedLatinum network hash rate.");
+
+    return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 120);
+}
+
 
 Value getworkex(const Array& params, bool fHelp)
 {

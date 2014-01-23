@@ -449,7 +449,7 @@ bool AppInit2()
     if (file) fclose(file);
     static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
     if (!lock.try_lock())
-        return InitError(strprintf(_("Cannot obtain a lock on data directory %s.  NovaCoin is probably already running."), strDataDir.c_str()));
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s.  GoldPressedLatinum is probably already running."), strDataDir.c_str()));
 
 #if !defined(WIN32) && !defined(QT_GUI)
     if (fDaemon)
@@ -491,7 +491,7 @@ bool AppInit2()
 
     // ********************************************************* Step 5: verify database integrity
 
-    uiInterface.InitMessage(_("Verifying database integrity..."));
+    uiInterface.InitMessage(_("<b>Verifying database integrity...</b>"));
 
     if (!bitdb.Open(GetDataDir()))
     {
@@ -646,8 +646,8 @@ bool AppInit2()
         AddOneShot(strDest);
 
     // TODO: replace this by DNSseed
-    AddOneShot(string("82.211.30.212"));
-    AddOneShot(string("81.17.30.114"));
+    AddOneShot(string("84.200.17.249"));
+   
 
     // ********************************************************* Step 7: load blockchain
 
@@ -667,8 +667,8 @@ bool AppInit2()
         return false;
     }
 
-    uiInterface.InitMessage(_("Loading block index..."));
-    printf("Loading block index...\n");
+    uiInterface.InitMessage(_("Loading block index, this may take several minutes..."));
+    printf("Loading block index, this may take several minutes...\n");
     nStart = GetTimeMillis();
     if (!LoadBlockIndex())
         return InitError(_("Error loading blkindex.dat"));
@@ -788,7 +788,7 @@ bool AppInit2()
     }
     if (pindexBest != pindexRescan && pindexBest && pindexRescan && pindexBest->nHeight > pindexRescan->nHeight)
     {
-        uiInterface.InitMessage(_("Rescanning..."));
+        uiInterface.InitMessage(_("<b>Rescanning...</b>"));
         printf("Rescanning last %i blocks (from block %i)...\n", pindexBest->nHeight - pindexRescan->nHeight, pindexRescan->nHeight);
         nStart = GetTimeMillis();
         pwalletMain->ScanForWalletTransactions(pindexRescan, true);
@@ -799,7 +799,7 @@ bool AppInit2()
 
     if (mapArgs.count("-loadblock"))
     {
-        uiInterface.InitMessage(_("Importing blockchain data file."));
+        uiInterface.InitMessage(_("<b>Importing blockchain data file.</b>"));
 
         BOOST_FOREACH(string strFile, mapMultiArgs["-loadblock"])
         {
@@ -811,7 +811,7 @@ bool AppInit2()
 
     filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
     if (filesystem::exists(pathBootstrap)) {
-        uiInterface.InitMessage(_("Importing bootstrap blockchain data file."));
+        uiInterface.InitMessage(_("<b>Importing bootstrap blockchain data file.</b>"));
 
         FILE *file = fopen(pathBootstrap.string().c_str(), "rb");
         if (file) {

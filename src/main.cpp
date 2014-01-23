@@ -44,7 +44,7 @@ int64 nChainStartTime = 1377557832;
 int nCoinbaseMaturity = 100;
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
-int64 nBestHeightTime = 0;   // WM - Keep track of timestamp of block at best height.
+int64 nBestHeightTime = 0;
 CBigNum bnBestChainTrust = 0;
 CBigNum bnBestInvalidTrust = 0;
 uint256 hashBestChain = 0;
@@ -926,7 +926,9 @@ bool CBlock::ReadFromDisk(const CBlockIndex* pindex, bool fReadTransactions)
     }
     if (!ReadFromDisk(pindex->nFile, pindex->nBlockPos, fReadTransactions))
         return false;
-    if (GetHash() != pindex->GetBlockHash())
+    uint256 cachedHash = GetHash();
+    uint256 computedHash = pindex->GetBlockHash();
+    if (cachedHash != computedHash)
         return error("CBlock::ReadFromDisk() : GetHash() doesn't match index");
     return true;
 }
@@ -1810,6 +1812,7 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
     pindexBest = pindexNew;
     pblockindexFBBHLast = NULL;
     nBestHeight = pindexBest->nHeight;
+    nBestHeightTime = pindexBest->GetBlockTime();
     bnBestChainTrust = pindexNew->bnChainTrust;
     nTimeBestReceived = GetTime();
     nTransactionsUpdated++;
@@ -1925,7 +1928,6 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
     CBlockIndex* pindexNew = new CBlockIndex(nFile, nBlockPos, *this);
     if (!pindexNew)
         return error("AddToBlockIndex() : new CBlockIndex failed");
-    pindexNew->phashBlock = &hash;
     map<uint256, CBlockIndex*>::iterator miPrev = mapBlockIndex.find(hashPrevBlock);
     if (miPrev != mapBlockIndex.end())
     {
@@ -1962,7 +1964,7 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
     map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
     if (pindexNew->IsProofOfStake())
         setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
-    pindexNew->phashBlock = &((*mi).first);
+
 
     // Write to disk block index
     CTxDB txdb;
@@ -2753,11 +2755,11 @@ string GetWarnings(string strFor)
 
     // ppcoin: should not enter safe mode for longer invalid chain
     // ppcoin: if sync-checkpoint is too old do not enter safe mode
-    //if (Checkpoints::IsSyncCheckpointTooOld(60 * 60 * 24 * 10) && !fTestNet && !IsInitialBlockDownload())
-    //{
-    //    nPriority = 100;
-    //    strStatusBar = "WARNING: Checkpoint is too old. Wait for block chain to download, or notify developers.";
-    //}
+    if (Checkpoints::IsSyncCheckpointTooOld(60 * 60 * 24 * 10) && !fTestNet && !IsInitialBlockDownload())
+    {
+        nPriority = 100;
+        strStatusBar = "WARNING: Checkpoint is too old. Wait for block chain to download, or notify developers.";
+    }
 
     // ppcoin: if detected invalid checkpoint enter safe mode
     if (Checkpoints::hashInvalidCheckpoint != 0)
@@ -3254,7 +3256,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 pindex = pindex->pnext;
         }
 
-        vector<CBlock> vHeaders;
+        vector<CBlockHeader> vHeaders;
         int nLimit = 2000;
         printf("getheaders %d to %s\n", (pindex ? pindex->nHeight : -1), hashStop.ToString().substr(0,20).c_str());
         for (; pindex; pindex = pindex->pnext)
@@ -4404,6 +4406,7 @@ void BitcoinMiner(CWallet *pwallet, bool fProofOfStake)
 
             // Meter hashes/sec
             static int64 nHashCounter;
+
             if (nHPSTimerStart == 0)
             {
                 nHPSTimerStart = GetTimeMillis();
