@@ -71,7 +71,8 @@ int64 nHPSTimerStart;
 
 // Settings
 int64 nTransactionFee = MIN_TX_FEE;
-
+int64 nSplitThreshold = 5 * COIN;
+int64 nCombineThreshold = 1 * COIN;
 
 //////////////////////////////////////////////////////////////////////////////
 //
