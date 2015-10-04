@@ -128,6 +128,7 @@ TransactionView::TransactionView(QWidget *parent) :
     QAction *copyAmountAction = new QAction(tr("Copy amount"), this);
     QAction *editLabelAction = new QAction(tr("Edit label"), this);
     QAction *showDetailsAction = new QAction(tr("Show transaction details"), this);
+    QAction *showBlockBrowser = new QAction(tr("Show transaction in block browser"), this);
 
     contextMenu = new QMenu();
     contextMenu->addAction(copyAddressAction);
@@ -135,6 +136,7 @@ TransactionView::TransactionView(QWidget *parent) :
     contextMenu->addAction(copyAmountAction);
     contextMenu->addAction(editLabelAction);
     contextMenu->addAction(showDetailsAction);
+    contextMenu->addAction(showBlockBrowser);
 
     // Connect actions
     connect(dateWidget, SIGNAL(activated(int)), this, SLOT(chooseDate(int)));
@@ -150,6 +152,7 @@ TransactionView::TransactionView(QWidget *parent) :
     connect(copyAmountAction, SIGNAL(triggered()), this, SLOT(copyAmount()));
     connect(editLabelAction, SIGNAL(triggered()), this, SLOT(editLabel()));
     connect(showDetailsAction, SIGNAL(triggered()), this, SLOT(showDetails()));
+    connect(showBlockBrowser, SIGNAL(triggered()), this, SLOT(showBroswer()));
 }
 
 void TransactionView::setModel(WalletModel *model)
@@ -373,6 +376,19 @@ void TransactionView::showDetails()
         TransactionDescDialog dlg(selection.at(0));
         dlg.exec();
     }
+}
+
+void TransactionView::showBroswer()
+{
+    if(!transactionView->selectionModel())
+        return;
+    QModelIndexList selection = transactionView->selectionModel()->selectedRows();
+    QString transactionId;
+
+    if(!selection.isEmpty())
+        transactionId = selection.at(0).data(TransactionTableModel::TxIDRole).toString();
+
+    emit blockBrowserSignal(transactionId);
 }
 
 QWidget *TransactionView::createDateRangeWidget()
