@@ -36,6 +36,7 @@ uint256 hashGenesisBlock = hashGenesisBlockOfficial;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 static CBigNum bnProofOfStakeLimit(~uint256(0) >> 24);
 static CBigNum bnProofOfStakeHardLimit(~uint256(0) >> 30);
+static CBigNum bnProofOfStakeFork1Limit(~uint256(0) >> 28);
 static CBigNum bnInitialHashTarget(~uint256(0) >> 20);
 unsigned int nStakeMinAge = 60 * 60 * 24 * 365; // minimum age for coin age
 unsigned int nStakeMaxAge = 60 * 60 * 24 * 730; // stake age of full weight
@@ -960,6 +961,9 @@ unsigned char GetNfactor(int64 nTimestamp) {
 
     if (nTimestamp <= nChainStartTime)
         return 4;
+        
+    if (nTimestamp > HARDFORK1_SWITCH_TIME)
+        return 15;
 
     int64 s = nTimestamp - nChainStartTime;
     while ((s >> 1) > 3) {
@@ -1038,14 +1042,11 @@ unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fP
     if(fProofOfStake)
     {
         // Proof-of-Stake blocks has own target limit since nVersion=3 supermajority on mainNet and always on testNet
-        if(fTestNet)
-            bnTargetLimit = bnProofOfStakeHardLimit;
+        if(fTestNet || (pindexLast->GetBlockTime() > HARDFORK1_SWITCH_TIME))
+            bnTargetLimit = bnProofOfStakeFork1Limit;
         else
         {
-/*            if(fTestNet || (pindexLast->nHeight + 1 > 15000))
-                bnTargetLimit = bnProofOfStakeLimit;
-            else if(pindexLast->nHeight + 1 > 14060)*/ // DIFF
-                bnTargetLimit = bnProofOfStakeHardLimit;
+            bnTargetLimit = bnProofOfStakeHardLimit;
         }
     }
 
