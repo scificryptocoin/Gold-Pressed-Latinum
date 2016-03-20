@@ -300,19 +300,9 @@ This product includes software developed by the OpenSSL Project for use in the O
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+257"/>
-        <source>Sign &amp;message...</source>
-        <translation>&amp;Подписать сообщение</translation>
-    </message>
-    <message>
-        <location line="+237"/>
-        <source>Synchronizing with network...</source>
-        <translation>Синхронизация с сетью...</translation>
-    </message>
-    <message>
-        <location line="-299"/>
+        <location filename="../bitcoingui.cpp" line="+201"/>
         <source>&amp;Overview</source>
-        <translation>О&amp;бзор</translation>
+        <translation>Обзор</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -320,9 +310,29 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Показать общий обзор действий с бумажником</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+5"/>
+        <source>&amp;Send Bars</source>
+        <translation>Отправка монет</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Send Bars to a GoldPressedLatinum address</source>
+        <translation>Отправить монеты на указанный адрес GPL</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&amp;Receive Bars</source>
+        <translation>Получение монет</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show the list of addresses for receiving payments</source>
+        <translation>Показать список адресов для получения платежей</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>&amp;Transactions</source>
-        <translation>&amp;Транзакции</translation>
+        <translation>Транзакции</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -332,7 +342,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+5"/>
         <source>&amp;Address Book</source>
-        <translation>&amp;Адресная книга</translation>
+        <translation>Адресная книга</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -340,22 +350,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Изменить список сохранённых адресов и меток к ним</translation>
     </message>
     <message>
-        <location line="-13"/>
-        <source>&amp;Receive coins</source>
-        <translation>&amp;Получение монет</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Show the list of addresses for receiving payments</source>
-        <translation>Показать список адресов для получения платежей</translation>
-    </message>
-    <message>
-        <location line="-7"/>
-        <source>&amp;Send coins</source>
-        <translation>Отп&amp;равка монет</translation>
-    </message>
-    <message>
-        <location line="+35"/>
+        <location line="+16"/>
         <source>E&amp;xit</source>
         <translation>В&amp;ыход</translation>
     </message>
@@ -365,9 +360,9 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Закрыть приложение</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Show information about GoldPressedLatinum</source>
-        <translation>Показать информацию о GoldPressedLatinum&apos;е</translation>
+        <location line="+3"/>
+        <source>&amp;About GoldPressedLatinum</source>
+        <translation>Показать информацию о GoldPressedLatinum</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -385,71 +380,72 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Оп&amp;ции...</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>&amp;Encrypt Wallet...</source>
-        <translation>&amp;Зашифровать бумажник</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Backup Wallet...</source>
-        <translation>&amp;Сделать резервную копию бумажника</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>&amp;Change Passphrase...</source>
-        <translation>&amp;Изменить пароль</translation>
-    </message>
-    <message numerus="yes">
-        <location line="+241"/>
-        <source>~%n block(s) remaining</source>
-        <translation>
-            <numerusform>остался ~%n блок</numerusform>
-            <numerusform>осталось ~%n блоков</numerusform>
-            <numerusform>осталось ~%n блоков</numerusform>
-        </translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Downloaded %1 of %2 blocks of transaction history (%3% done).</source>
-        <translation>Загружено %1 из %2 блоков истории операций (%3% завершено).</translation>
-    </message>
-    <message>
-        <location line="-242"/>
-        <source>&amp;Export...</source>
-        <translation>&amp;Экспорт...</translation>
-    </message>
-    <message>
-        <location line="-58"/>
-        <source>Send coins to a GoldPressedLatinum address</source>
-        <translation>Отправить монеты на указанный адрес GoldPressedLatinum</translation>
-    </message>
-    <message>
-        <location line="+45"/>
+        <location line="+1"/>
         <source>Modify configuration options for GoldPressedLatinum</source>
         <translation>Изменить параметры конфигурации GoldPressedLatinum</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Export the data in the current tab to a file</source>
-        <translation>Экспортировать данные из вкладки в файл</translation>
+        <location line="+2"/>
+        <source>&amp;Show / Hide</source>
+        <translation>&amp;Показать / Скрыть</translation>
     </message>
     <message>
-        <location line="-10"/>
+        <location line="+1"/>
+        <source>&amp;Encrypt Wallet...</source>
+        <translation>&amp;Зашифровать бумажник</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Encrypt or decrypt wallet</source>
         <translation>Зашифровать или расшифровать бумажник</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
+        <source>&amp;Backup Wallet...</source>
+        <translation>&amp;Сделать резервную копию бумажника</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Backup wallet to another location</source>
         <translation>Сделать резервную копию бумажника в другом месте</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
+        <source>&amp;Change Passphrase...</source>
+        <translation>&amp;Изменить пароль</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Change the passphrase used for wallet encryption</source>
         <translation>Изменить пароль шифрования бумажника</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
+        <source>Sign &amp;message...</source>
+        <translation>&amp;Подписать сообщение</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&amp;Verify message...</source>
+        <translation>&amp;Проверить сообщение...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Block Bro&amp;wser</source>
+        <translation>Браузер блоков</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>&amp;Export...</source>
+        <translation>&amp;Экспорт...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Экспортировать данные из вкладки в файл</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>&amp;Debug window</source>
         <translation>&amp;Окно отладки</translation>
     </message>
@@ -459,32 +455,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Открыть консоль отладки и диагностики</translation>
     </message>
     <message>
-        <location line="-5"/>
-        <source>&amp;Verify message...</source>
-        <translation>&amp;Проверить сообщение...</translation>
-    </message>
-    <message>
-        <location line="-186"/>
-        <source>GoldPressedLatinum</source>
-        <translation>GoldPressedLatinum</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Wallet</source>
-        <translation>Бумажник</translation>
-    </message>
-    <message>
-        <location line="+168"/>
-        <source>&amp;About GoldPressedLatinum</source>
-        <translation>&amp;О GoldPressedLatinum</translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>&amp;Show / Hide</source>
-        <translation>&amp;Показать / Скрыть</translation>
-    </message>
-    <message>
-        <location line="+39"/>
+        <location line="+26"/>
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>
     </message>
@@ -495,6 +466,11 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+6"/>
+        <source>&amp;Network</source>
+        <translation>&amp;Сеть</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>&amp;Help</source>
         <translation>&amp;Помощь</translation>
     </message>
@@ -509,7 +485,7 @@ This product includes software developed by the OpenSSL Project for use in the O
         <translation>Панель действий</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+14"/>
         <location line="+9"/>
         <source>[testnet]</source>
         <translation>[тестовая сеть]</translation>
@@ -530,7 +506,26 @@ This product includes software developed by the OpenSSL Project for use in the O
         </translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+24"/>
+        <source>Synchronizing with network...</source>
+        <translation>Синхронизация с сетью...</translation>
+    </message>
+    <message numerus="yes">
+        <location line="+2"/>
+        <source>~%n block(s) remaining</source>
+        <translation>
+            <numerusform>остался ~%n блок</numerusform>
+            <numerusform>осталось ~%n блоков</numerusform>
+            <numerusform>осталось ~%n блоков</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Downloaded %1 of %2 blocks of transaction history (%3% done).</source>
+        <translation>Загружено %1 из %2 блоков истории операций (%3% завершено).</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Downloaded %1 blocks of transaction history.</source>
         <translation>Загружено %1 блоков истории транзакций.</translation>
     </message>
@@ -619,7 +614,7 @@ Address: %4
 </translation>
     </message>
     <message>
-        <location line="+100"/>
+        <location line="+108"/>
         <location line="+15"/>
         <source>URI handling</source>
         <translation>Обработка URI</translation>
@@ -659,6 +654,16 @@ Address: %4
         <location line="+0"/>
         <source>There was an error trying to save the wallet data to the new location.</source>
         <translation>При попытке сохранения данных бумажника в новое место произошла ошибка.</translation>
+    </message>
+    <message>
+        <location line="-775"/>
+        <source>GoldPressedLatinum</source>
+        <translation>GoldPressedLatinum</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Wallet</source>
+        <translation>Бумажник</translation>
     </message>
     <message>
         <location filename="../bitcoin.cpp" line="+109"/>
@@ -1916,11 +1921,16 @@ Address: %4
     </message>
     <message>
         <location line="+2"/>
+        <source>Minted</source>
+        <translation>Добыто PoS</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Mined</source>
         <translation>Добыто</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+41"/>
         <source>(n/a)</source>
         <translation>[не доступно]</translation>
     </message>
@@ -2005,6 +2015,11 @@ Address: %4
     </message>
     <message>
         <location line="+1"/>
+        <source>Minеed</source>
+        <translation>Добытые PoS</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Mined</source>
         <translation>Добытые</translation>
     </message>
@@ -2049,7 +2064,12 @@ Address: %4
         <translation>Показать подробности транзакции</translation>
     </message>
     <message>
-        <location line="+142"/>
+        <location line="+1"/>
+        <source>Show transaction in block browser</source>
+        <translation>Показать транзакцию в Браузере блоков</translation>
+    </message>
+    <message>
+        <location line="+144"/>
         <source>Export Transaction Data</source>
         <translation>Экспортировать данные транзакций</translation>
     </message>
