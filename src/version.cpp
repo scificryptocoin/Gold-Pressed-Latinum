@@ -11,7 +11,7 @@
 const std::string CLIENT_NAME("Latinum");
 
 // Client version number
-#define CLIENT_VERSION_SUFFIX   "-Arridor"
+#define CLIENT_VERSION_SUFFIX   "-Quark"
 
 
 // The following part of the code determines the CLIENT_BUILD variable.
@@ -37,7 +37,7 @@ const std::string CLIENT_NAME("Latinum");
 #define GIT_ARCHIVE 1
 #ifdef GIT_ARCHIVE
 #    define GIT_COMMIT_ID ""
-#    define GIT_COMMIT_DATE "18 October 2015"
+#    define GIT_COMMIT_DATE "20 March 2016"
 #endif
 
 #define BUILD_DESC_FROM_COMMIT(maj,min,rev,build,commit) \
