@@ -2156,6 +2156,42 @@ bool CBlock::AcceptBlock()
     return true;
 }
 
+CBigNum CBlockIndex::GetBlockTrust() const
+{
+    CBigNum bnTarget;
+    bnTarget.SetCompact(nBits);
+    if (bnTarget <= 0)
+        return 0;
+
+    //  new trust rules (since specific block on mainnet and always on testnet)
+    if (nHeight >= 0 || fTestNet) {
+        // first block trust - for future compatibility (i.e., forks :P)
+        if (pprev == NULL)
+            return 1;
+
+        // PoS after PoS? no trust!
+        // (no need to explicitly disallow consecutive PoS
+        // blocks now as they won't get any trust anyway)
+        if (IsProofOfStake() && pprev->IsProofOfStake())
+            return 0;
+
+        // PoS after PoW? max trust
+        if (IsProofOfStake() && pprev->IsProofOfWork())
+            return 10;
+
+        // PoW trust calculation
+        if (IsProofOfWork())
+            return 1;
+
+        // what the hell?!
+        return 0;
+    }
+
+    // old rules
+    return (IsProofOfStake()? (CBigNum(1)<<256) / (bnTarget+1) : 1);
+}
+ 
+
 bool CBlockIndex::IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
 {
     unsigned int nFound = 0;
