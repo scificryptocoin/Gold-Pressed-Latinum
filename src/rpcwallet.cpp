@@ -520,6 +520,7 @@ int64 GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinD
         if (nReceived != 0 && wtx.GetDepthInMainChain() >= nMinDepth)
             nBalance += nReceived;
         nBalance += nGenerated - nSent - nFee;
+
     }
 
     // Tally internal accounting entries
