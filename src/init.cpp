@@ -231,7 +231,7 @@ std::string HelpMessage()
         "  -socks=<n>             " + _("Select the version of socks proxy to use (4-5, default: 5)") + "\n" +
         "  -tor=<ip:port>         " + _("Use proxy to reach tor hidden services (default: same as -proxy)") + "\n"
         "  -dns                   " + _("Allow DNS lookups for -addnode, -seednode and -connect") + "\n" +
-        "  -port=<port>           " + _("Listen for connections on <port> (default: 7688 or testnet: 17688)") + "\n" +
+        "  -port=<port>           " + _("Listen for connections on <port> (default: 23635 or testnet: 33635)") + "\n" +
         "  -maxconnections=<n>    " + _("Maintain at most <n> connections to peers (default: 125)") + "\n" +
         "  -addnode=<ip>          " + _("Add a node to connect to and attempt to keep the connection open") + "\n" +
         "  -connect=<ip>          " + _("Connect only to the specified node(s)") + "\n" +
@@ -239,7 +239,6 @@ std::string HelpMessage()
         "  -externalip=<ip>       " + _("Specify your own public address") + "\n" +
         "  -onlynet=<net>         " + _("Only connect to nodes in network <net> (IPv4, IPv6 or Tor)") + "\n" +
         "  -discover              " + _("Discover own IP address (default: 1 when listening and no -externalip)") + "\n" +
-        "  -irc                   " + _("Find peers using internet relay chat (default: 1)") + "\n" +
         "  -listen                " + _("Accept connections from outside (default: 1 if no -proxy or -connect)") + "\n" +
         "  -bind=<addr>           " + _("Bind to given address. Use [host]:port notation for IPv6") + "\n" +
         "  -dnsseed               " + _("Find peers using DNS lookup (default: 0)") + "\n" +
@@ -273,13 +272,15 @@ std::string HelpMessage()
 #endif
         "  -rpcuser=<user>        " + _("Username for JSON-RPC connections") + "\n" +
         "  -rpcpassword=<pw>      " + _("Password for JSON-RPC connections") + "\n" +
-        "  -rpcport=<port>        " + _("Listen for JSON-RPC connections on <port> (default: 8344 or testnet: 18344)") + "\n" +
+        "  -rpcport=<port>        " + _("Listen for JSON-RPC connections on <port> (default: 23645 or testnet: 33645)") + "\n" +
         "  -rpcallowip=<ip>       " + _("Allow JSON-RPC connections from specified IP address") + "\n" +
         "  -rpcconnect=<ip>       " + _("Send commands to node running on <ip> (default: 127.0.0.1)") + "\n" +
         "  -blocknotify=<cmd>     " + _("Execute command when the best block changes (%s in cmd is replaced by block hash)") + "\n" +
         "  -upgradewallet         " + _("Upgrade wallet to latest format") + "\n" +
         "  -keypool=<n>           " + _("Set key pool size to <n> (default: 100)") + "\n" +
         "  -rescan                " + _("Rescan the block chain for missing wallet transactions") + "\n" +
+        "  -splitthreshold=<n>    " + _("Set stake split threshold within range (default 5),(max 200))") + "\n" +
+        "  -combinethreshold=<n>  " + _("Set stake combine threshold within range (default 1),(max 100))") + "\n" +
         "  -salvagewallet         " + _("Attempt to recover private keys from a corrupt wallet.dat") + "\n" +
         "  -checkblocks=<n>       " + _("How many blocks to check at startup (default: 2500, 0 = all)") + "\n" +
         "  -checklevel=<n>        " + _("How thorough the block verification is (0-6, default: 1)") + "\n" +
@@ -349,9 +350,6 @@ bool AppInit2()
     // ********************************************************* Step 2: parameter interactions
 
     fTestNet = GetBoolArg("-testnet");
-    if (fTestNet) {
-        SoftSetBoolArg("-irc", true);
-    }
 
     if (mapArgs.count("-bind")) {
         // when specifying an explicit binding address, you want to listen on it
@@ -491,7 +489,7 @@ bool AppInit2()
 
     // ********************************************************* Step 5: verify database integrity
 
-    uiInterface.InitMessage(_("<b>Verifying database integrity...</b>"));
+    uiInterface.InitMessage(_("Verifying database integrity..."));
 
     if (!bitdb.Open(GetDataDir()))
     {
@@ -521,6 +519,28 @@ bool AppInit2()
         }
         if (r == CDBEnv::RECOVER_FAIL)
             return InitError(_("wallet.dat corrupt, salvage failed"));
+    }
+
+    if (mapArgs.count("-splitthreshold"))
+    {
+        if (!ParseMoney(mapArgs["-splitthreshold"], nSplitThreshold))
+            return InitError(strprintf(_("Invalid amount for -splitthreshold=<amount>: '%s'"), mapArgs["-splitthreshold"].c_str()));
+        else {
+            if (nSplitThreshold > MAX_SPLIT_AMOUNT)
+                nSplitThreshold = MAX_SPLIT_AMOUNT;
+        }
+        printf("splitthreshold set to %"PRI64d"\n",nSplitThreshold);
+    }
+ 
+    if (mapArgs.count("-combinethreshold"))
+    {
+        if (!ParseMoney(mapArgs["-combinethreshold"], nCombineThreshold))
+            return InitError(strprintf(_("Invalid amount for -combinethreshold=<amount>: '%s'"), mapArgs["-combinethreshold"].c_str()));
+        else {
+            if (nCombineThreshold > MAX_COMBINE_AMOUNT)
+                nCombineThreshold = MAX_COMBINE_AMOUNT;
+        }
+        printf("combinethreshold set to %"PRI64d"\n",nCombineThreshold);
     }
 
     // ********************************************************* Step 6: network initialization
@@ -646,7 +666,7 @@ bool AppInit2()
         AddOneShot(strDest);
 
     // TODO: replace this by DNSseed
-    AddOneShot(string("84.200.17.249"));
+    // AddOneShot(string("84.200.17.249"));
    
 
     // ********************************************************* Step 7: load blockchain
@@ -788,7 +808,7 @@ bool AppInit2()
     }
     if (pindexBest != pindexRescan && pindexBest && pindexRescan && pindexBest->nHeight > pindexRescan->nHeight)
     {
-        uiInterface.InitMessage(_("<b>Rescanning...</b>"));
+        uiInterface.InitMessage(_("Rescanning..."));
         printf("Rescanning last %i blocks (from block %i)...\n", pindexBest->nHeight - pindexRescan->nHeight, pindexRescan->nHeight);
         nStart = GetTimeMillis();
         pwalletMain->ScanForWalletTransactions(pindexRescan, true);
@@ -799,7 +819,7 @@ bool AppInit2()
 
     if (mapArgs.count("-loadblock"))
     {
-        uiInterface.InitMessage(_("<b>Importing blockchain data file.</b>"));
+        uiInterface.InitMessage(_("Importing blockchain data file."));
 
         BOOST_FOREACH(string strFile, mapMultiArgs["-loadblock"])
         {
@@ -811,7 +831,7 @@ bool AppInit2()
 
     filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
     if (filesystem::exists(pathBootstrap)) {
-        uiInterface.InitMessage(_("<b>Importing bootstrap blockchain data file.</b>"));
+        uiInterface.InitMessage(_("Importing bootstrap blockchain data file."));
 
         FILE *file = fopen(pathBootstrap.string().c_str(), "rb");
         if (file) {

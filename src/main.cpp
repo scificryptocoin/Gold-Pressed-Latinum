@@ -36,6 +36,7 @@ uint256 hashGenesisBlock = hashGenesisBlockOfficial;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 static CBigNum bnProofOfStakeLimit(~uint256(0) >> 24);
 static CBigNum bnProofOfStakeHardLimit(~uint256(0) >> 30);
+static CBigNum bnProofOfStakeFork1Limit(~uint256(0) >> 28);
 static CBigNum bnInitialHashTarget(~uint256(0) >> 20);
 unsigned int nStakeMinAge = 60 * 60 * 24 * 365; // minimum age for coin age
 unsigned int nStakeMaxAge = 60 * 60 * 24 * 730; // stake age of full weight
@@ -71,7 +72,8 @@ int64 nHPSTimerStart;
 
 // Settings
 int64 nTransactionFee = MIN_TX_FEE;
-
+int64 nSplitThreshold = 5 * COIN;
+int64 nCombineThreshold = 1 * COIN;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -959,6 +961,9 @@ unsigned char GetNfactor(int64 nTimestamp) {
 
     if (nTimestamp <= nChainStartTime)
         return 4;
+        
+    if (nTimestamp > HARDFORK1_SWITCH_TIME)
+        return 15;
 
     int64 s = nTimestamp - nChainStartTime;
     while ((s >> 1) > 3) {
@@ -1037,14 +1042,11 @@ unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fP
     if(fProofOfStake)
     {
         // Proof-of-Stake blocks has own target limit since nVersion=3 supermajority on mainNet and always on testNet
-        if(fTestNet)
-            bnTargetLimit = bnProofOfStakeHardLimit;
+        if(fTestNet || (pindexLast->GetBlockTime() > HARDFORK1_SWITCH_TIME))
+            bnTargetLimit = bnProofOfStakeFork1Limit;
         else
         {
-/*            if(fTestNet || (pindexLast->nHeight + 1 > 15000))
-                bnTargetLimit = bnProofOfStakeLimit;
-            else if(pindexLast->nHeight + 1 > 14060)*/ // DIFF
-                bnTargetLimit = bnProofOfStakeHardLimit;
+            bnTargetLimit = bnProofOfStakeHardLimit;
         }
     }
 
@@ -2153,6 +2155,42 @@ bool CBlock::AcceptBlock()
 
     return true;
 }
+
+CBigNum CBlockIndex::GetBlockTrust() const
+{
+    CBigNum bnTarget;
+    bnTarget.SetCompact(nBits);
+    if (bnTarget <= 0)
+        return 0;
+
+    //  new trust rules (since specific block on mainnet and always on testnet)
+    if (nHeight >= 0 || fTestNet) {
+        // first block trust - for future compatibility (i.e., forks :P)
+        if (pprev == NULL)
+            return 1;
+
+        // PoS after PoS? no trust!
+        // (no need to explicitly disallow consecutive PoS
+        // blocks now as they won't get any trust anyway)
+        if (IsProofOfStake() && pprev->IsProofOfStake())
+            return 0;
+
+        // PoS after PoW? max trust
+        if (IsProofOfStake() && pprev->IsProofOfWork())
+            return 10;
+
+        // PoW trust calculation
+        if (IsProofOfWork())
+            return 1;
+
+        // what the hell?!
+        return 0;
+    }
+
+    // old rules
+    return (IsProofOfStake()? (CBigNum(1)<<256) / (bnTarget+1) : 1);
+}
+ 
 
 bool CBlockIndex::IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
 {
@@ -3957,7 +3995,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
         }
     }
 
-    pblock->nBits = GetNextTargetRequired(pindexPrev, pblock->IsProofOfStake());
+    pblock->nBits = GetNextTargetRequired(pindexPrev, fProofOfStake);
 
     // Collect memory pool transactions into the block
     int64 nFees = 0;
@@ -4072,7 +4110,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
                 continue;
 
             // Timestamp limit
-            if (tx.nTime > GetAdjustedTime() || (pblock->IsProofOfStake() && tx.nTime > pblock->vtx[1].nTime))
+            if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > pblock->vtx[1].nTime))
                 continue;
 
             // ppcoin: simplify transaction fee - allow free = false
@@ -4151,16 +4189,16 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
         if (fDebug && GetBoolArg("-printpriority"))
             printf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
 
-        if (pblock->IsProofOfWork())
+        if (!fProofOfStake)
             pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits);
 
         // Fill in header
         pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
-        if (pblock->IsProofOfStake())
+        if (fProofOfStake)
             pblock->nTime      = pblock->vtx[1].nTime; //same as coinstake timestamp
         pblock->nTime          = max(pindexPrev->GetMedianTimePast()+1, pblock->GetMaxTransactionTime());
         pblock->nTime          = max(pblock->GetBlockTime(), pindexPrev->GetBlockTime() - nMaxClockDrift);
-        if (pblock->IsProofOfWork())
+        if (!fProofOfStake)
             pblock->UpdateTime(pindexPrev);
         pblock->nNonce         = 0;
     }
@@ -4337,6 +4375,7 @@ void BitcoinMiner(CWallet *pwallet, bool fProofOfStake)
                 SetThreadPriority(THREAD_PRIORITY_NORMAL);
                 CheckWork(pblock.get(), *pwalletMain, reservekey);
                 SetThreadPriority(THREAD_PRIORITY_LOWEST);
+                Sleep(500);
             }
             Sleep(500);
             continue;

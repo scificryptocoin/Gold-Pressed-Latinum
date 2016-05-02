@@ -165,6 +165,11 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
     {
         return AmountExceedsBalance;
     }
+    
+    if(total <= MIN_TXOUT_AMOUNT)
+    {
+        return InvalidAmount;
+    }
 
     if((total + nTransactionFee) > getBalance())
     {

@@ -17,12 +17,11 @@ Scrypt-Jane Proof of Work+Proof of Stake
 
 0.02% transaction fee
 
+5% PoS rate yearly
 
+RPC Port = 23645
 
-RPC Port = 8344
-
-P2P Port: 7688
-
+P2P Port: 23635
 
 
 "Once you have their money, you never give it back."

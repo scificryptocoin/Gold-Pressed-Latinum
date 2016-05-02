@@ -14,6 +14,8 @@
 #include <QTextDocument>
 #include <QScrollBar>
 
+extern bool fWalletUnlockMintOnly;
+
 SendCoinsDialog::SendCoinsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SendCoinsDialog),
@@ -68,6 +70,13 @@ void SendCoinsDialog::on_sendButton_clicked()
     if(!model)
         return;
 
+    if (fWalletUnlockMintOnly) {
+        QMessageBox::warning(this, tr("Wallet in staking mode"),
+            tr("Please turn off stake minting before attempting to send coins."),
+            QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
+    
     for(int i = 0; i < ui->entries->count(); ++i)
     {
         SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
@@ -127,7 +136,7 @@ void SendCoinsDialog::on_sendButton_clicked()
         break;
     case WalletModel::InvalidAmount:
         QMessageBox::warning(this, tr("Send Coins"),
-            tr("The amount to pay must be larger than 0."),
+            tr("The amount to pay must be larger than 0.0002."),
             QMessageBox::Ok, QMessageBox::Ok);
         break;
     case WalletModel::AmountExceedsBalance:

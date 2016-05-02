@@ -35,9 +35,13 @@ static const int64 MIN_RELAY_TX_FEE = 0.02 * CENT;
 static const int64 MAX_MONEY = 1000000 * COIN;
 static const int64 MAX_MINT_PROOF_OF_WORK = .2 * COIN;
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
+/** Split/Combine Threshold Max */
+static const int64 MAX_SPLIT_AMOUNT = 200 * COIN;
+static const int64 MAX_COMBINE_AMOUNT = 50 * COIN;
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
+static const unsigned int HARDFORK1_SWITCH_TIME = 1447200000; // Wed, 11 Nov 2015 00:00:00 GMT
 
 #ifdef USE_UPNP
 static const int fHaveUPnP = true;
@@ -85,6 +89,8 @@ extern std::map<uint256, CBlock*> mapOrphanBlocks;
 
 // Settings
 extern int64 nTransactionFee;
+extern int64 nCombineThreshold;
+extern int64 nSplitThreshold;
 
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64 nMinDiskSpace = 52428800;
@@ -1267,15 +1273,14 @@ public:
         return GetHash();
     }
 
-    CBigNum GetBlockTrust() const
-    {
+    CBigNum GetBlockTrust() const;
+/*  {
         CBigNum bnTarget;
         bnTarget.SetCompact(nBits);
         if (bnTarget <= 0)
             return 0;
         return (IsProofOfStake()? (CBigNum(1)<<256) / (bnTarget+1) : 1);
-    }
-
+    } */
     bool IsInMainChain() const
     {
         return (pnext || this == pindexBest);
